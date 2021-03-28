@@ -1,7 +1,7 @@
 <template>
     <div class="comment-content">
         <div class="left">
-            <img src="img/avatar.png">
+            <img src="@/img/avatar.png">
         </div>
         <div class="right">
             <div class="name">Name</div>
@@ -13,14 +13,13 @@
 </template>
 <script>
     export default {
-        name: 'Comment'
     }
 </script>
 <style scoped>
     .comment-content{
         display: flex;
         flex-direction: row;
-        background: black;
+        color: white;
     }
 
     .left{

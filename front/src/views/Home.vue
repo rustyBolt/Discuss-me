@@ -19,42 +19,21 @@
         </div>
       </div>
       <div class="vertical"></div>
-      <div class="comments">
-        <div class="left">
-            <img src="@/views/avatar.png">
-        </div>
-        <div class="right">
-            <div class="name">Name</div>
-            <div class="text">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-            </div>
-        </div>
-      </div>
+      <Comment />
       <div class="vertical"></div>
-      <div class="answered">
-        <div class="left">
-            <img src="@/views/avatar.png">
-        </div>
-        <div class="right">
-            <div class="name">Name</div>
-            <div class="text">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-            </div>
-        </div>
-      </div>
+      <Comment />
     </div>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-//import Comment from "@/views/Comment.vue";
+import Comment from "@/views/Comment.vue";
 
 export default {
-  //name: "Comment",
-  //components: {
-  //  Comment
-  //},
+  components: {
+    Comment
+  },
   mounted() {
       let id = this.$router.currentRoute._value.query.id;
       console.log(id);
