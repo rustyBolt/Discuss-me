@@ -1,0 +1,20 @@
+{
+    "sqltools.connections": [
+        {
+            "pgOptions": {
+                "ssl": {
+                    "rejectUnauthorized": false,
+                    "requestCert": false
+                }
+            },
+            "previewLimit": 50,
+            "server": "ec2-54-74-156-137.eu-west-1.compute.amazonaws.com",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "name": "database",
+            "database": "dbl18jsrmkmgeq",
+            "username": "eayhhtepxjremh",
+            "password": "5a89b5ff10c493409887c19837a53bcaa393e7416a65ec81d58ce6fd0997ee77"
+        }
+    ]
+}
