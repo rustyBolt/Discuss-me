@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import {User} from '../../../entity/user.entity';
 import {Credentials} from '../../../entity/credentials.entity'
 import {Repository} from 'typeorm';
+import {hash} from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -22,7 +23,7 @@ export class UserService {
         let user = new UserDto();
 
         credentials.email = taken.email;
-        credentials.password = taken.password;
+        credentials.password = await hash(taken.password, 10);
 
         await this.credentialRepository.save(credentials);
 
@@ -30,9 +31,11 @@ export class UserService {
              .where("credentials.email = :email", {email: taken.email})
              .select(["id_credentials", "email", "password"]).execute();
 
-         user.username = taken.username;
-         user.id_credentials = result[0];
+        user.username = taken.username;
+        user.id_credentials = result[0];
 
-         this.userRepository.save(user);
+        let ret = this.userRepository.save(user);
+
+        console.log(ret);
     }
 }

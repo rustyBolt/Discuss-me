@@ -8,13 +8,13 @@
                 }
             },
             "previewLimit": 50,
-            "server": "ec2-54-74-156-137.eu-west-1.compute.amazonaws.com",
+            "server": "ec2-52-19-164-214.eu-west-1.compute.amazonaws.com",
             "port": 5432,
             "driver": "PostgreSQL",
             "name": "database",
-            "database": "dbl18jsrmkmgeq",
-            "username": "eayhhtepxjremh",
-            "password": "5a89b5ff10c493409887c19837a53bcaa393e7416a65ec81d58ce6fd0997ee77"
+            "database": "d8lvbunoso29ho",
+            "username": "mhhotixzzyzuvb",
+            "password": "93db7bfc9c36449a94732a60d52d8727991d7399fe11eeed39d7660ad64c2e59"
         }
     ]
 }

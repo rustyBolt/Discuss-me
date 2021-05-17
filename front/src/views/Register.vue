@@ -2,21 +2,35 @@
     <div class="whole">
         <div class="back">
             <div class="logo"></div>
-            <input placeholder="e-mail">
-            <input placeholder="password">
-            <input placeholder="repeat password">
-            <input placeholder="username">
-            <div class="file-input">
-                Add profile image
-                <input type="file" accept="image/*" placeholder="image">
-            </div>
-            <button>Create account</button>
+            <form v-on:submit.prevent="register()" method="POST">
+                <input v-model="username" name="username" type="text" placeholder="username">
+                <input v-model="email" name="email" type="text" placeholder="email">
+                <input v-model="password" name="password" type="password" placeholder="password">
+                <input v-model="passwordagain" name="passwordagain" type="password" placeholder="repeat password">
+                <button type='submit'>Create account</button>
+            </form>
         </div>
     </div>
 </template>
 <script>
+    import axios from 'axios';
 
 export default {
+    data: function(){
+        return {username: '',
+        email: '',
+        password: '',
+        passwordagain: ''}
+    },
+    methods: {
+        register: function(){
+            let dataToSend = { "username": this.username,
+                         "email": this.email,
+                          "password": this.password };
+            axios.post('http://localhost:3000/user', dataToSend);
+                    //.then(response => (console.log(response)));
+        }
+    }
     
 }
 </script>
@@ -47,7 +61,7 @@ export default {
 
     input{
         width: 80%;
-        height: 10%;
+        height: 15%;
         border: none;
         border-radius: 10px;
         margin: 15px;
@@ -59,7 +73,7 @@ export default {
 
     button{
         width: 20%;
-        height: 10%;
+        height: 15%;
         border: none;
         border-radius: 10px;
         background: black;
