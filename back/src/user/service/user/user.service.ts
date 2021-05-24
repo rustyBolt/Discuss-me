@@ -6,7 +6,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import {User} from '../../../entity/user.entity';
 import {Credentials} from '../../../entity/credentials.entity'
 import {Repository} from 'typeorm';
-import {hash} from 'bcrypt';
+import {hash, compare} from 'bcrypt';
+import { LoginDto } from "src/user/dto/login.dto";
 
 @Injectable()
 export class UserService {
@@ -37,5 +38,22 @@ export class UserService {
         let ret = this.userRepository.save(user);
 
         console.log(ret);
+    }
+
+    async login(cred: LoginDto){
+
+        let pass = await this.credentialRepository.createQueryBuilder("credentials")
+            .where("credentials.email = :email", {email: cred.email})
+            .select(["password"]).execute();
+
+        console.log(pass);
+
+        let same = await compare(cred.password, pass[0].password);
+
+        if (same){
+            return "Success";
+        }
+
+        return "Failure";
     }
 }

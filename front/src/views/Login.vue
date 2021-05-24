@@ -2,16 +2,33 @@
     <div class="whole">
         <div class="back">
             <div class="logo"></div>
-            <input placeholder="e-mail">
-            <input placeholder="password">
-            <button>Login</button>
+            <form v-on:submit.prevent="login()" method="POST">
+                <input v-model="email" name="email" type="text" placeholder="email">
+                <input v-model="password" name="password" type="password" placeholder="password">
+                <button type='submit'>Login</button>
+            </form>
         </div>
     </div>
 </template>
 <script>
 
+import axios from 'axios';
+
 export default {
-    
+    data: function(){
+        return {
+            email: '',
+            password: '',} 
+    },
+    methods: {
+        login: function(){
+            let dataToSend = {"email": this.email,
+                          "password": this.password };
+
+            axios.post('http://localhost:3000/user/login', dataToSend)
+                    .then(response => (console.log(response)));
+        }
+    }
 }
 </script>
 <style scoped>
@@ -41,7 +58,7 @@ export default {
 
     input{
         width: 80%;
-        height: 10%;
+        height: 20%;
         border: none;
         border-radius: 10px;
         margin: 15px;
@@ -49,7 +66,7 @@ export default {
 
     button{
         width: 20%;
-        height: 10%;
+        height: 20%;
         border: none;
         border-radius: 10px;
         background: black;
