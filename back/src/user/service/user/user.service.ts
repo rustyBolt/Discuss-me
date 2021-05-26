@@ -8,6 +8,7 @@ import {Credentials} from '../../../entity/credentials.entity'
 import {Repository} from 'typeorm';
 import {hash, compare} from 'bcrypt';
 import { LoginDto } from "src/user/dto/login.dto";
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UserService {
@@ -16,7 +17,9 @@ export class UserService {
         private userRepository: Repository<User>,
 
         @InjectRepository(Credentials)
-        private credentialRepository: Repository<Credentials>
+        private credentialRepository: Repository<Credentials>,
+
+        private jwtService: JwtService
     ){}
 
     async create(taken: TakenDto){
@@ -44,14 +47,18 @@ export class UserService {
 
         let pass = await this.credentialRepository.createQueryBuilder("credentials")
             .where("credentials.email = :email", {email: cred.email})
-            .select(["password"]).execute();
-
-        console.log(pass);
+            .select(["id_credentials", "password"]).execute();
 
         let same = await compare(cred.password, pass[0].password);
 
         if (same){
-            return "Success";
+            let user = await this.userRepository.createQueryBuilder("user")
+            .where("user.idCredentialsIdCredentials = :id", {id: pass[0].id_credentials})
+            .select(["id_user", "username"]).execute();
+
+            return {
+                access_token: this.jwtService.sign(user[0]),
+              };
         }
 
         return "Failure";
