@@ -26,11 +26,15 @@ export default {
                           "password": this.password };
 
             axios.post('http://localhost:3000/user/login', dataToSend)
-                    .then(response => (axios.get('http://localhost:3000/user/profile', { headers: { Authorization: 'Bearer '.concat(response.data.access_token) } })
+                    .then(response => (localStorage.setItem('token', response.data.access_token)));
+
+            let token = localStorage.getItem('token');
+
+            axios.get('http://localhost:3000/user/profile', { headers: { Authorization: 'Bearer '.concat(token) } })
             .then(response => {
                 // If request is good...
                 console.log(response.data);
-            })));
+            })
         }
     }
 }
