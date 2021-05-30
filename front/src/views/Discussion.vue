@@ -20,7 +20,10 @@
       </div>
       <div class="vertical"></div>
       <div v-for="comment in data.comments" v-bind:key="comment">
-            <Comment :username="comment.username" :content="comment.content"/>
+            <Comment :username="comment.username" :content="comment.content" v-if="comment.answer_to == null"/>
+            <div v-for="answer in data.comments" v-bind:key="answer">
+              <Comment :username="answer.username" :content="answer.content" v-if="answer.answer_to == comment.id_comment"/>
+            </div>
         </div>
       <form v-on:submit.prevent="add()" method="POST">
           <input v-model="content" name="content" type="text" placeholder="Write a comment">
@@ -56,7 +59,10 @@ export default {
 
         console.log(dataToSend);
         axios.post('http://localhost:3000/discussion/comment', dataToSend)
-                .then(response => (console.log(response)));
+                .then(response => {
+                  response.data.id_comment = -1;
+                  this.data.comments.unshift(response.data)
+                  });
     }
   },
   async mounted() {
