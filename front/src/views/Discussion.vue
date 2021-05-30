@@ -19,14 +19,18 @@
         </div>
       </div>
       <div class="vertical"></div>
-      <div v-for="comment in data.comments" v-bind:key="comment">
+      <div v-for="comment in data.comments" v-bind:key="comment" v-on:click="answ(comment.id_comment)">
             <Comment :username="comment.username" :content="comment.content" v-if="comment.answer_to == null"/>
-            <div v-for="answer in data.comments" v-bind:key="answer">
-              <Comment :username="answer.username" :content="answer.content" v-if="answer.answer_to == comment.id_comment"/>
+            <div v-for="answer in answers[comment.id_comment]" v-bind:key="answer">
+              <Comment :username="answer.username" :content="answer.content"/>
             </div>
         </div>
-      <form v-on:submit.prevent="add()" method="POST">
+      <form v-on:submit.prevent="add('comment')" method="POST">
           <input v-model="content" name="content" type="text" placeholder="Write a comment">
+          <button type='submit'>Add</button>
+      </form>
+      <form v-on:submit.prevent="add('answer')" method="POST">
+          <input v-model="content" name="content" type="text" placeholder="Write an answer">
           <button type='submit'>Add</button>
       </form>
     </div>
@@ -43,26 +47,47 @@ export default {
     return {
       data: {},
       content: '',
-      user: {}
+      user: {},
+      answers: {},
+      answer: null
     }
   },
   components: {
     Comment
   },
   methods: {
-    add: function(){
+    add: function(mode){
         let dataToSend = {
           id: this.data.id_discussion,
           username: this.user.username,
           content: this.content
         };
 
+        if (mode == 'comment'){
+          dataToSend['answer_to'] = null;
+        }
+        else {
+          dataToSend['answer_to'] = this.answer;
+        }
+
         console.log(dataToSend);
         axios.post('http://localhost:3000/discussion/comment', dataToSend)
                 .then(response => {
                   response.data.id_comment = -1;
-                  this.data.comments.unshift(response.data)
+                  if (mode == 'comment'){
+                    this.data.comments.unshift(response.data);
+                  }
+                  else {
+                    this.answers[dataToSend['answer_to']].push(response.data);
+                  }
+                  
                   });
+
+        this.content = '';
+    },
+    answ: function(id){
+      this.answer = id;
+      console.log(this.answer);
     }
   },
   async mounted() {
@@ -72,6 +97,17 @@ export default {
         .then(response => (this.data = response.data));
       
       console.log(this.data);
+
+      for (const com of this.data.comments){
+        if (com.answer_to == null){
+          this.answers[com.id_comment] = [];
+        }
+        else {
+          this.answers[com.answer_to].push(com);
+        }
+      }
+
+      console.log(this.answers);
 
       let token = localStorage.getItem('token');
 

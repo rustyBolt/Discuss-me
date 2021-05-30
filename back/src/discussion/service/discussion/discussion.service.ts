@@ -44,7 +44,7 @@ export class DiscussionService {
 
         comment.username = data.username;
         comment.content = data.content;
-        comment.answer_to = null;
+        comment.answer_to = data.answer_to;
         comment.discussion = discussion;
 
         this.commentRepository.save(comment);
