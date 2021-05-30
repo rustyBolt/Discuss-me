@@ -12,6 +12,16 @@ export class ControllerController {
         this.discussionService.addDiscussion(data);
     }
 
+    @Post('one')
+    getDiscussion(@Body() id: any): Promise<any>{
+        return this.discussionService.getDiscussion(id);
+    }
+
+    @Post('comment')
+    addComment(@Body() data: any): Promise<any>{
+        return this.discussionService.addComment(data);
+    }
+
     @Get('all')
     everything(): Promise<any>{
         let ret =  this.discussionService.everything();

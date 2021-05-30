@@ -19,9 +19,13 @@
         </div>
       </div>
       <div class="vertical"></div>
-      <Comment />
-      <div class="vertical"></div>
-      <Comment />
+      <div v-for="comment in data.comments" v-bind:key="comment">
+            <Comment :username="comment.username" :content="comment.content"/>
+        </div>
+      <form v-on:submit.prevent="add()" method="POST">
+          <input v-model="content" name="content" type="text" placeholder="Write a comment">
+          <button type='submit'>Add</button>
+      </form>
     </div>
   </div>
 </template>
@@ -29,14 +33,50 @@
 <script>
 // @ is an alias to /src
 import Comment from "@/views/Comment.vue";
+import axios from 'axios';
 
 export default {
+  data: function(){
+    return {
+      data: {},
+      content: '',
+      user: {}
+    }
+  },
   components: {
     Comment
   },
-  mounted() {
+  methods: {
+    add: function(){
+        let dataToSend = {
+          id: this.data.id_discussion,
+          username: this.user.username,
+          content: this.content
+        };
+
+        console.log(dataToSend);
+        axios.post('http://localhost:3000/discussion/comment', dataToSend)
+                .then(response => (console.log(response)));
+    }
+  },
+  async mounted() {
       let id = this.$router.currentRoute._value.query.id;
       console.log(id);
+      await axios.post('http://localhost:3000/discussion/one', {id: id})
+        .then(response => (this.data = response.data));
+      
+      console.log(this.data);
+
+      let token = localStorage.getItem('token');
+
+      await axios.get('http://localhost:3000/user/profile', { headers: { Authorization: 'Bearer '.concat(token) } })
+      .then(response => {
+          // If request is good...
+          console.log(response.data);
+          this.user = response.data;
+      })
+
+      console.log(this.user);
   }
 }
 

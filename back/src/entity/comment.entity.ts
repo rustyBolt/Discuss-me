@@ -12,7 +12,7 @@ export class Comment {
     @Column({nullable: false})
     content: string;
 
-    @Column()
+    @Column({nullable: true})
     answer_to: number;
 
     @ManyToOne(() => Discussion, discussion => discussion.comments, {onUpdate: 'CASCADE', onDelete: 'CASCADE'})

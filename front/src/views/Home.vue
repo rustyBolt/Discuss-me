@@ -1,6 +1,6 @@
 <template>
     <div class="featured">
-        <div v-for="discussion in discussions" v-bind:key="discussion">
+        <div v-for="discussion in discussions" v-bind:key="discussion" v-on:click="redirect(discussion.id_discussion)">
             <Miniature :namez="discussion.name" :description="discussion.description"/>
         </div>
             <form v-on:submit.prevent="add()" method="POST">
@@ -32,6 +32,9 @@ export default {
             console.log(dataToSend);
             axios.post('http://localhost:3000/discussion', dataToSend);
                     //.then(response => (console.log(response)));
+        },
+        redirect: function(id){
+            this.$router.push('/discussion?id='.concat(id));
         }
     },
     async mounted(){

@@ -4,15 +4,20 @@
             <img src="@/img/avatar.png">
         </div>
         <div class="right">
-            <div class="name">Name</div>
-            <div class="text">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
+            <div class="username">{{username}}</div>
+            <div class="content">
+                {{content}}
             </div>
         </div>
     </div>
 </template>
 <script>
     export default {
+        name: 'Comment',
+        props: {
+            username: String,
+            content: String
+        }
     }
 </script>
 <style scoped>

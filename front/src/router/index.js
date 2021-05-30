@@ -3,12 +3,12 @@ import Discussion from '../views/Discussion.vue'
 
 const routes = [
   {
-    path: '/',
+    path: '/discussion',
     name: 'Discussion',
     component: Discussion
   },
   {
-    path: '/login',
+    path: '/',
     name: 'Login',
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
