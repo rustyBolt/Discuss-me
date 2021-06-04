@@ -26,21 +26,38 @@ export class UserService {
         let credentials = new CredentialsDto();
         let user = new UserDto();
 
+        let result = await this.credentialRepository.createQueryBuilder("credentials")
+              .where("credentials.email = :email", {email: taken.email})
+              .select(["id_credentials", "email", "password"]).execute();
+
+        if (result.length > 0){
+            return 'User already created account with this email!';
+        }
+
+        let result2 = await this.userRepository.createQueryBuilder("user")
+              .where("user.username = :username", {username: taken.username})
+              .select(["username"]).execute();
+
+        if (result2.length > 0){
+            return 'Username already taken!';
+        }
+
         credentials.email = taken.email;
         credentials.password = await hash(taken.password, 10);
 
         await this.credentialRepository.save(credentials);
 
-        let result = await this.credentialRepository.createQueryBuilder("credentials")
-             .where("credentials.email = :email", {email: taken.email})
-             .select(["id_credentials", "email", "password"]).execute();
+        // let result = await this.credentialRepository.createQueryBuilder("credentials")
+        //      .where("credentials.email = :email", {email: taken.email})
+        //      .select(["id_credentials", "email", "password"]).execute();
 
         user.username = taken.username;
-        user.id_credentials = result[0];
+        user.id_credentials = credentials;
 
         let ret = this.userRepository.save(user);
 
         console.log(ret);
+        return 'Success';
     }
 
     async login(cred: LoginDto){
@@ -49,18 +66,21 @@ export class UserService {
             .where("credentials.email = :email", {email: cred.email})
             .select(["id_credentials", "password"]).execute();
 
-        let same = await compare(cred.password, pass[0].password);
+        if (pass.length > 0){
 
-        if (same){
-            let user = await this.userRepository.createQueryBuilder("user")
-            .where("user.idCredentialsIdCredentials = :id", {id: pass[0].id_credentials})
-            .select(["id_user", "username"]).execute();
+            let same = await compare(cred.password, pass[0].password);
 
-            return {
-                access_token: this.jwtService.sign(user[0]),
-              };
+            if (same){
+                let user = await this.userRepository.createQueryBuilder("user")
+                .where("user.idCredentialsIdCredentials = :id", {id: pass[0].id_credentials})
+                .select(["id_user", "username"]).execute();
+
+                return {
+                    access_token: this.jwtService.sign(user[0]),
+                };
+            }
         }
 
-        return "Failure";
+        return "Incorrect email or password!";
     }
 }

@@ -8,6 +8,8 @@
       <div class="hub">
         {{data.name}}
         {{data.description}}
+        <button v-if="user.userId" v-on:click="logout()">Logout</button>
+        <button v-else v-on:click="login()">Login</button>
       </div>
     </div>
     <hr>
@@ -171,6 +173,13 @@ export default {
     },
     closeAnswer: function(){
       this.answering = !this.answering;
+    },
+    login: function(){
+      this.$router.push('/');
+    },
+    logout: function(){
+      localStorage.removeItem('token');
+      this.$router.push('/');
     }
   },
   async mounted() {

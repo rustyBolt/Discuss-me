@@ -2,11 +2,13 @@
     <div class="whole">
         <div class="back">
             <div class="logo"></div>
+            <div>{{hint}}</div>
             <form v-on:submit.prevent="login()" method="POST">
                 <input v-model="email" name="email" type="text" placeholder="email">
                 <input v-model="password" name="password" type="password" placeholder="password">
                 <button type='submit'>Login</button>
             </form>
+            <button v-on:click="register()">Create account</button>
         </div>
     </div>
 </template>
@@ -18,7 +20,8 @@ export default {
     data: function(){
         return {
             email: '',
-            password: '',} 
+            password: '',
+            hint: ''} 
     },
     methods: {
         login: function(){
@@ -26,15 +29,19 @@ export default {
                           "password": this.password };
 
             axios.post('http://localhost:3000/user/login', dataToSend)
-                    .then(response => (localStorage.setItem('token', response.data.access_token)));
-
-            let token = localStorage.getItem('token');
-
-            axios.get('http://localhost:3000/user/profile', { headers: { Authorization: 'Bearer '.concat(token) } })
-            .then(response => {
-                // If request is good...
-                console.log(response.data);
-            })
+                    .then(response => {
+                        let data =response.data;
+                        if(typeof data === 'object' && data !== null){
+                            localStorage.setItem('token', data.access_token);
+                            this.$router.push('/home');
+                            }
+                        else{
+                            this.hint = data;
+                        }
+                        });
+        },
+        register: function(){
+            this.$router.push('/register');
         }
     }
 }

@@ -10,8 +10,8 @@ export class ControlerController {
     constructor(private userService: UserService){}
 
     @Post()
-    create(@Body() taken: TakenDto){
-        this.userService.create(taken);
+    create(@Body() taken: TakenDto): Promise<string>{
+        return this.userService.create(taken);
     }
 
     @Post('login')

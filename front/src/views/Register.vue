@@ -2,13 +2,15 @@
     <div class="whole">
         <div class="back">
             <div class="logo"></div>
+            <div>{{hint}}</div>
             <form v-on:submit.prevent="register()" method="POST">
                 <input v-model="username" name="username" type="text" placeholder="username">
-                <input v-model="email" name="email" type="text" placeholder="email">
-                <input v-model="password" name="password" type="password" placeholder="password">
-                <input v-model="passwordagain" name="passwordagain" type="password" placeholder="repeat password">
+                <input v-model="email" v-on:change="checkEmail()" name="email" type="text" placeholder="email">
+                <input v-model="password" v-on:change="checkPassword()" name="password" type="password" placeholder="password">
+                <input v-model="passwordagain" v-on:change="checkPassword()" name="passwordagain" type="password" placeholder="repeat password">
                 <button type='submit'>Create account</button>
             </form>
+            
         </div>
     </div>
 </template>
@@ -20,15 +22,45 @@ export default {
         return {username: '',
         email: '',
         password: '',
-        passwordagain: ''}
+        passwordagain: '',
+        hint: ''}
     },
     methods: {
         register: function(){
             let dataToSend = { "username": this.username,
                          "email": this.email,
                           "password": this.password };
-            axios.post('http://localhost:3000/user', dataToSend);
-                    //.then(response => (console.log(response)));
+            axios.post('http://localhost:3000/user', dataToSend)
+                    .then(response => {
+                        console.log(response.data);
+                        let data =response.data;
+                        if (data === 'Success'){
+                            
+                            this.login();
+                        }
+                        else{
+                            this.hint = data;
+                        }
+                    });
+        },
+        login: function(){
+            this.$router.push('/');
+        },
+        checkPassword: function(){
+            if (this.password === this.passwordagain){
+                this.hint = '';
+            }
+            else{
+                this.hint = 'Passwords must be the same!';
+            }
+        },
+        checkEmail: function(){
+            if (this.email.includes('@') && this.email.includes('.')){
+                this.hint = '';
+            }
+            else{
+                this.hint = 'This is not proper email!';
+            }
         }
     }
     
