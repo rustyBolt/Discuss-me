@@ -6,15 +6,19 @@
       <div class="logo">
       </div>
       <div class="hub">
+        {{data.name}}
+        {{data.description}}
       </div>
     </div>
     <hr>
     <div class="content">
       <div class="groups">
-        <div class="group">
-          G
+        <div v-for="group in data.groups" v-bind:key="group">
+          <div class="group" v-on:click="pop(group)">
+            {{group.name[0]}}
+          </div>
         </div>
-        <div class="add">
+        <div class="add" v-on:click="groupAddingModal()">
           +
         </div>
       </div>
@@ -29,10 +33,28 @@
           <input v-model="content" name="content" type="text" placeholder="Write a comment">
           <button type='submit'>Add</button>
       </form>
-      <form v-on:submit.prevent="add('answer')" method="POST">
-          <input v-model="content" name="content" type="text" placeholder="Write an answer">
-          <button type='submit'>Add</button>
-      </form>
+      <dialog className="dialog" style="position: 'absolute'" open v-if="answering">
+        <button v-on:click="closeAnswer()">x</button>
+        <form v-on:submit.prevent="add('answer')" method="POST">
+            <input v-model="content" name="content" type="text" placeholder="Write an answer">
+            <button type='submit'>Add</button>
+        </form>
+      </dialog>
+      <dialog className="dialog" style="position: 'absolute'" open v-if="addingGroup">
+        <button v-on:click="groupAddingModal()">x</button>
+        <form v-on:submit.prevent="addGroup()" method="POST">
+            <input v-model="groupName" name="content" type="text" placeholder="Name a group">
+            <input v-model="groupDescription" name="content" type="text" placeholder="Describe a group">
+            <button type='submit'>Add</button>
+        </form>
+      </dialog>
+      <dialog className="dialog" style="position: 'absolute'" open v-if="poped">
+          <button v-on:click="closePop()">x</button>
+          <text>{{groupSelected.name}}</text>
+          <text>{{groupSelected.description}}</text>
+          <button v-if="joined" v-on:click="leave(groupSelected.id_group)">Leave</button>
+          <button v-else v-on:click="join(groupSelected.id_group)">Join</button>
+      </dialog>
     </div>
   </div>
 </template>
@@ -49,7 +71,14 @@ export default {
       content: '',
       user: {},
       answers: {},
-      answer: null
+      answer: null,
+      groupName: '',
+      groupDescription: '',
+      poped: false,
+      groupSelected: {},
+      joined: false,
+      addingGroup: false,
+      answering: false
     }
   },
   components: {
@@ -73,7 +102,6 @@ export default {
         console.log(dataToSend);
         axios.post('http://localhost:3000/discussion/comment', dataToSend)
                 .then(response => {
-                  response.data.id_comment = -1;
                   if (mode == 'comment'){
                     this.data.comments.unshift(response.data);
                   }
@@ -88,6 +116,61 @@ export default {
     answ: function(id){
       this.answer = id;
       console.log(this.answer);
+      this.answering = !this.answering;
+    },
+    addGroup: function(){
+      let dataToSend = {
+        id_user: this.user.userId,
+        username: this.user.username,
+        id_discussion: this.data.id_discussion,
+        name_discussion: this.data.name,
+        description_discussion: this.data.discussion,
+        name: this.groupName,
+        description: this.groupDescription
+      };
+
+      axios.post('http://localhost:3000/discussion/group', dataToSend)
+        .then(response => this.data.groups.push(response.data));
+    },
+    pop: function(group){
+      this.groupSelected = group;
+      this.poped = !this.poped;
+      for (const user of group.users){
+        if (user.id_user === this.user.userId){
+          this.joined = true;
+        }
+      }
+    },
+    closePop: function(){
+      this.poped = !this.poped;
+      this.joined = false;
+    },
+    leave: function(id){
+      let dataToSend = {
+        id_group: id,
+        id_user: this.user.userId
+      };
+
+      axios.post('http://localhost:3000/discussion/leave', dataToSend);
+
+      this.joined = false;
+    },
+    join: function(id){
+      let dataToSend = {
+        id_group: id,
+        id_user: this.user.userId,
+        username: this.user.username
+      };
+
+      axios.post('http://localhost:3000/discussion/join', dataToSend);
+
+      this.joined = true;
+    },
+    groupAddingModal: function(){
+      this.addingGroup = !this.addingGroup;
+    },
+    closeAnswer: function(){
+      this.answering = !this.answering;
     }
   },
   async mounted() {
@@ -95,8 +178,6 @@ export default {
       console.log(id);
       await axios.post('http://localhost:3000/discussion/one', {id: id})
         .then(response => (this.data = response.data));
-      
-      console.log(this.data);
 
       for (const com of this.data.comments){
         if (com.answer_to == null){
@@ -107,8 +188,6 @@ export default {
         }
       }
 
-      console.log(this.answers);
-
       let token = localStorage.getItem('token');
 
       await axios.get('http://localhost:3000/user/profile', { headers: { Authorization: 'Bearer '.concat(token) } })
@@ -117,8 +196,6 @@ export default {
           console.log(response.data);
           this.user = response.data;
       })
-
-      console.log(this.user);
   }
 }
 

@@ -22,6 +22,21 @@ export class ControllerController {
         return this.discussionService.addComment(data);
     }
 
+    @Post('group')
+    addGroup(@Body() data: any): Promise<any>{
+        return this.discussionService.addGroup(data);
+    }
+
+    @Post('leave')
+    leave(@Body() data: any){
+        this.discussionService.leave(data);
+    }
+
+    @Post('join')
+    join(@Body() data: any){
+        this.discussionService.join(data);
+    }
+
     @Get('all')
     everything(): Promise<any>{
         let ret =  this.discussionService.everything();
