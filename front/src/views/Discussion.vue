@@ -6,55 +6,66 @@
       <div class="logo">
       </div>
       <div class="hub">
-        {{data.name}}
-        {{data.description}}
-        <button v-if="user.userId" v-on:click="logout()">Logout</button>
-        <button v-else v-on:click="login()">Login</button>
+        <div class="name">{{data.name}}</div>
+        <div class="description">{{data.description}}</div>
+        <button class="log" v-if="user.userId" v-on:click="logout()">Logout</button>
+        <button class="log" v-else v-on:click="login()">Login</button>
       </div>
     </div>
     <hr>
     <div class="content">
       <div class="groups">
+        <div class="add" v-on:click="groupAddingModal()">
+          +
+        </div>
         <div v-for="group in data.groups" v-bind:key="group">
           <div class="group" v-on:click="pop(group)">
             {{group.name[0]}}
           </div>
         </div>
-        <div class="add" v-on:click="groupAddingModal()">
-          +
-        </div>
       </div>
       <div class="vertical"></div>
-      <div v-for="comment in data.comments" v-bind:key="comment" v-on:click="answ(comment.id_comment)">
-            <Comment :username="comment.username" :content="comment.content" v-if="comment.answer_to == null"/>
-            <div v-for="answer in answers[comment.id_comment]" v-bind:key="answer">
-              <Comment :username="answer.username" :content="answer.content"/>
-            </div>
+      <div class="section">
+        <form v-if="!user.userId">You must be logged in to comment</form>
+        <form v-else v-on:submit.prevent="add('comment')" method="POST">
+            <input v-model="content" name="content" type="text" placeholder="Write a comment">
+            <button type='submit'>Add</button>
+        </form>
+        <div class="comments">
+          <div v-for="comment in data.comments" v-bind:key="comment" v-on:click="answ(comment.id_comment)">
+                <Comment :username="comment.username" :content="comment.content" v-if="comment.answer_to == null"/>
+                  <div v-for="answer in answers[comment.id_comment]" v-bind:key="answer">
+                    <div class="answered">
+                      <div class="space"></div>
+                      <Comment :username="answer.username" :content="answer.content"/>
+                    </div>
+                  </div>
+          </div>
         </div>
-      <form v-on:submit.prevent="add('comment')" method="POST">
-          <input v-model="content" name="content" type="text" placeholder="Write a comment">
-          <button type='submit'>Add</button>
-      </form>
+      </div>
       <dialog className="dialog" style="position: 'absolute'" open v-if="answering">
         <button v-on:click="closeAnswer()">x</button>
-        <form v-on:submit.prevent="add('answer')" method="POST">
+        <form v-if="!user.userId">You must be logged in to answer</form>
+        <form v-else v-on:submit.prevent="add('answer')" method="POST">
             <input v-model="content" name="content" type="text" placeholder="Write an answer">
             <button type='submit'>Add</button>
         </form>
       </dialog>
       <dialog className="dialog" style="position: 'absolute'" open v-if="addingGroup">
         <button v-on:click="groupAddingModal()">x</button>
-        <form v-on:submit.prevent="addGroup()" method="POST">
+        <form v-if="user.userId" v-on:submit.prevent="addGroup()" method="POST">
             <input v-model="groupName" name="content" type="text" placeholder="Name a group">
             <input v-model="groupDescription" name="content" type="text" placeholder="Describe a group">
             <button type='submit'>Add</button>
         </form>
+        <form v-else>You must be logged in to create a group</form>
       </dialog>
-      <dialog className="dialog" style="position: 'absolute'" open v-if="poped">
+      <dialog className="groupDialog" style="position: 'absolute'" open v-if="poped">
           <button v-on:click="closePop()">x</button>
-          <text>{{groupSelected.name}}</text>
+          <text class="groupName">{{groupSelected.name}}</text>
           <text>{{groupSelected.description}}</text>
-          <button v-if="joined" v-on:click="leave(groupSelected.id_group)">Leave</button>
+          <div v-if="!user.userId">You must be logged in to join a group</div>
+          <button v-else-if="joined" v-on:click="leave(groupSelected.id_group)">Leave</button>
           <button v-else v-on:click="join(groupSelected.id_group)">Join</button>
       </dialog>
     </div>
@@ -227,13 +238,39 @@ export default {
 
   .upper-part{
     display: flex;
-    flex-direction: row;
-    height: 10%;
+    flex-direction: column;
+    height: 15vh;
+    width: 100vw;
+    align-items: center;
+  }
+
+  .hub{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: white;
+  }
+
+  .name{
+    font-size: 2em;
+  }
+
+  .log{
+    width: 10%;
+    height: 7%;
+    border: none;
+    border-radius: 10px;
+    background: black;
+    color: white;
+    position: absolute;
+    top: 3vh;
+    right: 5vw;
+    font-size: 1.3em;
   }
 
   .vertical{ 
     border-left: 3px solid white; 
-    height: 200px; 
+    height: 500px; 
   }
 
   .content{
@@ -248,20 +285,29 @@ export default {
     height: 100%;
   }
 
-  .comments{
-    width: 45%;
-    height: 100%;
+  .section{
+    width: 90vw;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
+  }
+
+  .comments{
+    width: 90%;
+    height: 70vh;
+    display: flex;
+    flex-direction: column;
     color: white;
+    overflow: scroll;
   }
 
   .answered{
-    width: 45%;
-    height: 100%;
+    width: 100%;
     display: flex;
     flex-direction: row;
-    color: white;
+  }
+
+  .space{
+    width: 4vw;
   }
 
   .left{
@@ -286,6 +332,7 @@ export default {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    overflow: scroll;
   }
 
   .group{
@@ -311,4 +358,98 @@ export default {
     align-items: center;
     justify-content: center
   }
+
+  input{
+    width: 60vw;
+    height: 5vh;
+    background: none;
+    color: white;
+    border-top: none;
+    border-right: none;
+    border-left: none;
+    font-size: 1em;
+  }
+
+  button{
+    width: 5vw;
+    height: 5vh;
+    border: none;
+    border-radius: 10px;
+    background: black;
+    color: white;
+    font-size: 1em;
+  }
+
+  dialog{
+    background: grey;
+    border-radius: 10px;
+  }
+
+  dialog>form{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .groupDialog{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .groupName{
+    font-size: 1.5em;
+  }
+
+  @media screen and (max-width: 800px) {
+  .content{
+    flex-direction: column;
+  }
+
+  .vertical{
+    display: none;
+  }
+
+  button{
+    width: 30vw;
+  }
+
+  .logo{
+    height: 10vh;
+  }
+
+  .log{
+    width: 30%;
+  }
+
+  .groups{
+    display:flex;
+    flex-direction: row;
+    justify-content: left;
+    width: 100%;
+  }
+
+  .add{
+    width: 30vw;
+    height: 30vw;
+  }
+
+  .group{
+    width: 30vw;
+    height: 30vw;
+    justify-content: none;
+  }
+
+  .comments{
+    width:100%;
+  }
+
+  .space{
+    width: 6vw;
+  }
+
+  dialog{
+    top: 40vh;
+  }
+}
 </style>

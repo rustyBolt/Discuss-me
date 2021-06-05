@@ -8,8 +8,8 @@ export class ControllerController {
     constructor(private discussionService: DiscussionService){}
 
     @Post()
-    addDiscussion(@Body() data: any){
-        this.discussionService.addDiscussion(data);
+    addDiscussion(@Body() data: any): Promise<any>{
+        return this.discussionService.addDiscussion(data);
     }
 
     @Post('one')

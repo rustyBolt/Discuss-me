@@ -25,7 +25,7 @@ export class DiscussionService {
         let adding = new Discussion();
         adding.name = data.name;
         adding.description = data.description;
-        await this.discussionRepository.save(adding);
+        return await this.discussionRepository.save(adding);
     }
 
     async getDiscussion(id: any){

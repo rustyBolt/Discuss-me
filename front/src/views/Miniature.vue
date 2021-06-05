@@ -21,5 +21,12 @@
         flex-direction: column;
         color: white;
         padding: 10px;
+        background: #51575e;
+        border-radius: 10px;
+        margin: 10px;
+    }
+
+    .name{
+        font-size: 2em;
     }
 </style>

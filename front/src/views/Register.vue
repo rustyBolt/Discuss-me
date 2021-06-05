@@ -113,13 +113,14 @@ export default {
         margin: 15px;
     }
 
-    .file-input{
-        width: 80%;
-        background: white;
-        border-radius: 10px;
-        display: flex;
-        flex-direction: column;
-        justify-content: left;
-        break-inside: avoid;
+    @media screen and (max-width: 800px) {
+        .back{
+            width: 100vw;
+        }
+
+        button{
+            width: 40%;
+        }
     }
+
 </style>

@@ -21,7 +21,8 @@ export default {
         return {
             email: '',
             password: '',
-            hint: ''} 
+            hint: '',
+            user: {}} 
     },
     methods: {
         login: function(){
@@ -42,6 +43,19 @@ export default {
         },
         register: function(){
             this.$router.push('/register');
+        }
+    },
+    async mounted(){
+        let token = localStorage.getItem('token');
+
+        await axios.get('http://localhost:3000/user/profile', { headers: { Authorization: 'Bearer '.concat(token) } })
+        .then(response => {
+            // If request is good...
+            this.user = response.data;
+        });
+
+        if (this.user.userId){
+            this.$router.push('/home');
         }
     }
 }
@@ -75,11 +89,24 @@ export default {
         width: 80%;
         height: 20%;
         border: none;
-        border-radius: 10px;
         margin: 15px;
     }
 
     button{
+        width: 20%;
+        height: 12%;
+        border: none;
+        border-radius: 10px;
+        background: black;
+        color: white;
+        margin: 15px;
+    }
+
+    form{
+        padding: 10px;
+    }
+
+    form>button{
         width: 20%;
         height: 20%;
         border: none;
@@ -87,5 +114,19 @@ export default {
         background: black;
         color: white;
         margin: 15px;
+    }
+
+    @media screen and (max-width: 800px) {
+        .back{
+            width: 100vw;
+        }
+
+        button{
+            width: 40%;
+        }
+
+        form>button{
+            width: 40%;
+        }
     }
 </style>
