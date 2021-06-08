@@ -41,7 +41,7 @@ export class DiscussionService {
         console.log(data);
         let comment = new Comment();
         let discussion = new Discussion();
-        let dis = await this.getDiscussion(data.id);
+        let dis = await this.getDiscussion({id: data.id_discussion});
 
         discussion.id_discussion = dis.id_discussion;
         discussion.name = dis.name;

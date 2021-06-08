@@ -100,10 +100,12 @@ export default {
   methods: {
     add: function(mode){
         let dataToSend = {
-          id: this.data.id_discussion,
+          id_discussion: this.data.id_discussion,
           username: this.user.username,
           content: this.content
         };
+
+        console.log(dataToSend);
 
         if (mode == 'comment'){
           dataToSend['answer_to'] = null;
